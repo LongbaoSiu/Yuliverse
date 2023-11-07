@@ -1,0 +1,240 @@
+/** @OnlyCurrentDoc */
+function enterPurificationData() {
+  var ui = SpreadsheetApp.getUi();
+  var counter = 1;
+  var response;
+  var prompts = ["What is the date today (MM/DD/YYYY)?", "Which Yuli Purified? (" + getYuliNames() + ")", "What was the Purification Rank? (A, S, SR, SSR)", "Was there any Prayer buff?", "Was there a Team buff?","How many ARG acquired?"];
+  var responses = [];
+
+  while (counter <= prompts.length) {
+    if (counter == 4 || counter == 5){
+      response = ui.alert(prompts[counter - 1], ui.ButtonSet.YES_NO);  
+      if (response === ui.Button.YES) {
+        response = 0.1;
+      } else {
+        response = 0;
+      }
+      responses.push(response);
+    }
+    else{
+      response = ui.prompt(prompts[counter - 1], ui.ButtonSet.OK_CANCEL);
+      responses.push(response.getResponseText());
+    }
+    if (response === ui.Button.CANCEL) {
+      break;
+    }
+    
+    counter++;
+  }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records");
+  var lastRow = sheet.getLastRow();
+  var nextRow = lastRow + 1;
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,1).setValue(responses[0]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,2).setValue(responses[1]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,3).setValue(getYuliStats(responses[1])[1]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,4).setValue(getYuliStats(responses[1])[2]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,5).setValue(getYuliStats(responses[1])[3]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,6).setValue(getYuliStats(responses[1])[4]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,7).setValue(responses[3]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,8).setValue(responses[4]);
+  if (responses[2] == "A"){
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,9).setValue(responses[5]);
+  }
+  if (responses[2] == "S"){
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,10).setValue(responses[5]);
+  }
+  if (responses[2] == "SR"){
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,11).setValue(responses[5]);
+  }
+  if (responses[2] == "SSR"){
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Full Records").getRange(nextRow,12).setValue(responses[5]);
+  }
+  
+  ui.alert("Purification Entry Received");
+
+  
+}
+
+
+function getYuliNames(){
+  var yuliSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set");
+  var numYuli = yuliSheet.getLastRow();
+  var yuliNames = [];
+  for (var i = 2; i <= numYuli; i++) {
+    yuliNames.push(yuliSheet.getRange("A" + i).getValue());
+  }
+  var nameString = yuliNames.join(", ").slice(0, -2) + " and " + yuliNames.slice(-1);
+  return nameString;
+}
+
+function getYuliStats(yuliName){
+  var yuliSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set");
+  var stats = [];
+  var yuliTable = yuliSheet.getRange("A:H").getValues();
+  for (var i = 0; i < yuliTable.length; i++){
+    if(yuliTable[i][0] == yuliName){
+      stats[1] = yuliTable[i][4];
+      stats[2] = yuliTable[i][5];
+      stats[3] = yuliTable[i][6];
+      stats[4] = yuliTable[i][7];
+    }
+    
+  }
+  return stats;
+}
+
+function addYuli() {
+  var ui = SpreadsheetApp.getUi();
+  var counter = 1;
+  var response;
+  var prompts = ["What is your Yuli called?", "What is its ID?", "What Type is it? (1 = Prototype; 2 = Common; 3 = Uncommon; 4 = Superior; 5 = Epic; 6 = Legendary)", "What is its current level?", "Attribute: Compile","Attribute: Analysis","Attribute: Meditation","Attribute: Awaken"];
+  var responses = [];
+  var yuliType = ["Prototype","Common","Uncommon","Superior","Epic","Legendary"];
+
+  while (counter <= prompts.length) {
+    response = ui.prompt(prompts[counter - 1], ui.ButtonSet.OK_CANCEL);
+    if (response.getSelectedButton() == ui.Button.CANCEL) {
+      break;
+    }
+    if (counter == 2){
+      responses.push(parseInt(response.getResponseText()));
+    }
+    else {
+    responses.push(response.getResponseText()); 
+    }
+    counter++;
+  }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set");
+  var lastRow = sheet.getLastRow();
+  var nextRow = lastRow + 1;
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,1).setValue(responses[0]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,2).setValue(responses[1]);
+  var typeIndex = responses[2]-1;
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,3).setValue(yuliType[typeIndex]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,4).setValue(responses[3]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,5).setValue(responses[4]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,6).setValue(responses[5]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,7).setValue(responses[6]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,8).setValue(responses[7]);
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set").getRange(nextRow,9).setValue(responses[8]);
+  ui.alert("New Yuli Entered");
+ }
+
+ function updateYuli() {
+  var yuliSetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Yuli Set");
+  var ui = SpreadsheetApp.getUi();
+  
+  // Prompt user for Yuli ID
+  var yuliId = ui.prompt("Enter Yuli ID to update").getResponseText();
+  
+  // Find row number of Yuli with matching ID
+  var yuliData = yuliSetSheet.getDataRange().getValues();
+  var yuliRow = null;
+  for (var i = 1; i < yuliData.length; i++) {
+    if (yuliData[i][1] == yuliId) {
+      yuliRow = i + 1;
+      break;
+    }
+  }
+  
+  // If Yuli ID not found, show error message and exit function
+  if (yuliRow == null) {
+    ui.alert("Yuli with ID " + yuliId + " not found");
+    return;
+  }
+  
+  // Format Yuli information with column names
+  var yuliInfo = "Name: " + yuliData[yuliRow - 1][0] + "\n\n" +
+                 "ID: " + yuliData[yuliRow - 1][1] + "\n\n" +
+                 "Type: " + yuliData[yuliRow - 1][2] + "\n\n" +
+                 "Level: " + yuliData[yuliRow - 1][3] + "\n\n" +
+                 "Compile: " + yuliData[yuliRow - 1][4] + "\n\n" +
+                 "Analysis: " + yuliData[yuliRow - 1][5] + "\n\n" +
+                 "Meditation: " + yuliData[yuliRow - 1][6] + "\n\n" +
+                 "Awaken: " + yuliData[yuliRow - 1][7];
+  
+  // Show Yuli information and confirm update
+  var confirm = ui.alert("Is this the Yuli you want to update?\n\n" + yuliInfo, ui.ButtonSet.YES_NO);
+  
+  // If user clicks "No", exit function
+  if (confirm == ui.Button.NO) {
+    return;
+  }
+  
+  // Prompt user for updated Level
+  var newLevel = ui.prompt("Enter new Level").getResponseText();
+  
+  // Prompt user for updated Compile
+  var newCompile = ui.prompt("Enter new Compile").getResponseText();
+  
+  // Prompt user for updated Analysis
+  var newAnalysis = ui.prompt("Enter new Analysis").getResponseText();
+  
+  // Prompt user for updated Meditation
+  var newMeditation = ui.prompt("Enter new Meditation").getResponseText();
+  
+  // Prompt user for updated Awaken
+  var newAwaken = ui.prompt("Enter new Awaken").getResponseText();
+  
+  // Update Yuli Set sheet with new data
+  var range = yuliSetSheet.getRange(yuliRow, 4, 1, 5);
+  range.setValues([[newLevel, newCompile, newAnalysis, newMeditation, newAwaken]]);
+  
+  ui.alert("Yuli updated successfully");
+}
+
+function createPivotTables() {
+  var sheetName = "Full Records"; // Update sheet name
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(sheetName);
+  var dataRange = sheet.getDataRange();
+  var data = dataRange.getValues();
+  
+  var columnsToInclude = ["Yuli", "A", "S", "SR", "SSR"];
+
+  // Create a set of unique Yuli values
+  var uniqueYuli = new Set();
+  var yuliCol = data[0].indexOf("Yuli"); // Find index of Yuli column
+  for (var i = 1; i < data.length; i++) {
+    uniqueYuli.add(data[i][yuliCol]);
+  }
+  
+  // Loop through each unique Yuli value
+  uniqueYuli.forEach(function(yuli) {
+    // Create a new sheet for the pivot table
+    var pivotSheet = ss.insertSheet(yuli + " Records");
+    var ptLocation = pivotSheet.getRange("A3");
+    
+    // Create the pivot table
+    var pc = ptLocation.createPivotTable(dataRange);
+    var pt = pc.addPivotValue(yuliCol, SpreadsheetApp.PivotTableSummarizeFunction.SUM);
+    var dateCol = data[0].indexOf("Date");
+    for (var j = 0; j < data[0].length; j++) {
+      if (columnsToInclude.includes(data[0][j])) {
+        pt.addColumn(j, SpreadsheetApp.PivotTableSummarizeFunction.SUM);
+      }
+    }
+    pt.showAsPctOfColumnTotal(true);
+    pt.setDisplayName("Sum of " + yuli);
+    pt.setLabel("Sum of " + yuli);
+    pt.setShowTotals(true);
+    pt.setShowGrandTotals(true);
+    pt.setRowGroupControlPosition(SpreadsheetApp.PivotTableSummarizeFunction.GROUP_CONTROL_ABOVE);
+    pt.setColumnGroupControlPosition(SpreadsheetApp.PivotTableSummarizeFunction.GROUP_CONTROL_LEFT);
+    pt.setSortValuesBucket(SpreadsheetApp.PivotTableSortOrder.ASCENDING);
+    
+    // Add the Date column as a row group
+    
+  });
+}
+
+function test() {
+  var spreadsheet = SpreadsheetApp.getActive();
+  spreadsheet.getRange('A1:F19').activate();
+  var sourceData = spreadsheet.getRange('A1:F19');
+  spreadsheet.insertSheet(spreadsheet.getActiveSheet().getIndex() + 1).activate();
+  spreadsheet.getActiveSheet().setHiddenGridlines(true);
+  var pivotTable = spreadsheet.getRange('A1').createPivotTable(sourceData);
+};
