@@ -1,0 +1,68 @@
+/** @OnlyCurrentDoc */
+function Yuliverse_Attribute() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var light = sheet.getRange("B9").getValue();
+  var dark = sheet.getRange("B10").getValue();
+  var compile = sheet.getRange("B13").getValue();
+  var analysis = sheet.getRange("B14").getValue();
+  var meditation = sheet.getRange("B15").getValue();
+  var awaken = sheet.getRange("B16").getValue();
+ 
+  /** initialize distribution */
+  var add_compile = 0;
+  var add_analysis = 0;
+  var add_meditation = 0;
+  var add_awaken = 0;
+  var added_light = 0;
+  var added_dark = 0;
+
+  /** calculate light distribution */
+  while (light > added_light){
+  if (analysis <= compile * 1.25) {
+        analysis = analysis + 1;
+    add_analysis = add_analysis + 1;
+  } else {
+    compile = compile + 1;
+    add_compile = add_compile + 1;
+  }
+  added_light = added_light + 1;
+  }
+
+  /** calculate dark distribution */
+  while (dark > added_dark){
+  if (meditation >= 25) {
+    if (meditation - awaken > 6) {
+      awaken = awaken + 1;
+      add_awaken = add_awaken + 1;
+    } else {
+      meditation = meditation + 1;
+      add_meditation = add_meditation + 1;
+    }
+  } else {
+    meditation = meditation + 1;
+    add_meditation = add_meditation + 1;
+  }
+  added_dark = added_dark + 1;
+  }
+
+  /** Set new values */
+  sheet.getRange("C13").setValue(add_compile);
+  sheet.getRange("C14").setValue(add_analysis);
+  sheet.getRange("C15").setValue(add_meditation);
+  sheet.getRange("C16").setValue(add_awaken);
+}
+
+function Yuliverse_Attribute_Reset() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  sheet.getRange("B9").setValue(0);
+  sheet.getRange("B10").setValue(0);
+  sheet.getRange("B13").setValue(0);
+  sheet.getRange("B14").setValue(0);
+  sheet.getRange("B15").setValue(0);
+  sheet.getRange("B16").setValue(0);
+
+  sheet.getRange("C13").setValue(0);
+  sheet.getRange("C14").setValue(0);
+  sheet.getRange("C15").setValue(0);
+  sheet.getRange("C16").setValue(0);
+}
