@@ -18,7 +18,7 @@ function Yuliverse_Attribute() {
 
   /** calculate light distribution */
   while (light > added_light){
-  if (analysis <= compile * 1.25) {
+  if (analysis < compile * 1.25) {
         analysis = analysis + 1;
     add_analysis = add_analysis + 1;
   } else {
